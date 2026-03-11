@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { useState } from 'react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import Login from './pages/Login';
@@ -16,8 +17,8 @@ function ProtectedRoute({ children }) {
   if (loading) return (
     <div className="flex items-center justify-center min-h-screen bg-bg">
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-xl text-text-light">Loading RetireAssist...</p>
+        <img src="/logo.png" alt="RetireAssist" className="w-16 h-16 mx-auto mb-4 animate-pulse-soft" />
+        <p className="text-lg text-text-light">Loading RetireAssist...</p>
       </div>
     </div>
   );
@@ -25,17 +26,17 @@ function ProtectedRoute({ children }) {
 }
 
 function AppLayout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-bg">
-      <Navbar />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6 ml-0 md:ml-64 mt-20 min-h-[calc(100vh-80px)]">
-          <div className="max-w-6xl mx-auto animate-fade-in">
-            {children}
-          </div>
-        </main>
-      </div>
+      <Navbar sidebarOpen={sidebarOpen} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <main className="lg:ml-60 pt-16 min-h-screen">
+        <div className="max-w-5xl mx-auto p-4 lg:p-6 animate-fade-in">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }

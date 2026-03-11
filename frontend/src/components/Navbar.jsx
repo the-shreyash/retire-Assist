@@ -1,10 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiLogOut, FiBell, FiUser } from 'react-icons/fi';
+import { FiLogOut, FiBell, FiUser, FiMenu, FiX, FiShield } from 'react-icons/fi';
+import { useState } from 'react';
 
-export default function Navbar() {
+export default function Navbar({ sidebarOpen, onToggleSidebar }) {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
+    const [showProfile, setShowProfile] = useState(false);
 
     const handleLogout = () => {
         logout();
@@ -12,50 +14,77 @@ export default function Navbar() {
     };
 
     return (
-        <nav className="fixed top-0 left-0 right-0 z-50 bg-primary text-white shadow-xl h-20">
-            <div className="flex items-center justify-between h-full px-6">
-                {/* Logo */}
-                <Link to="/dashboard" className="flex items-center gap-3 no-underline">
-                    <div className="w-12 h-12 bg-accent rounded-2xl flex items-center justify-center text-2xl font-bold shadow-lg">
-                        R
-                    </div>
-                    <div>
-                        <h1 className="text-2xl font-bold text-white leading-tight">RetireAssist</h1>
-                        <p className="text-xs text-blue-200 hidden sm:block">Your Pension Companion</p>
-                    </div>
-                </Link>
+        <nav className="fixed top-0 left-0 right-0 z-50 bg-white border-b border-border h-16">
+            <div className="flex items-center justify-between h-full px-4 lg:px-6">
+                {/* Left: Menu + Logo */}
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={onToggleSidebar}
+                        className="w-10 h-10 rounded-lg flex items-center justify-center text-text-light hover:bg-bg hover:text-primary transition-all cursor-pointer border-none bg-transparent"
+                        aria-label="Toggle menu"
+                    >
+                        {sidebarOpen ? <FiX size={22} /> : <FiMenu size={22} />}
+                    </button>
+
+                    <Link to="/dashboard" className="flex items-center gap-2.5 no-underline">
+                        <img src="/logo.png" alt="RetireAssist" className="w-9 h-9 rounded-lg" />
+                        <div>
+                            <h1 className="text-lg font-bold text-text-dark leading-tight">RetireAssist</h1>
+                            <p className="text-[11px] text-text-light hidden sm:block leading-tight">Your Retirement Companion</p>
+                        </div>
+                    </Link>
+
+                    <span className="trust-badge hidden sm:inline-flex ml-2">
+                        <FiShield size={12} /> Secured
+                    </span>
+                </div>
 
                 {/* Right Section */}
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                     {/* Notification Bell */}
                     <button
                         onClick={() => navigate('/reminders')}
-                        className="relative w-12 h-12 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-all cursor-pointer border-none"
+                        className="relative w-10 h-10 rounded-lg flex items-center justify-center text-text-light hover:bg-bg hover:text-primary transition-all cursor-pointer border-none bg-transparent"
                     >
-                        <FiBell className="text-white" size={22} />
-                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-danger rounded-full text-[10px] flex items-center justify-center font-bold">3</span>
+                        <FiBell size={20} />
+                        <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
                     </button>
 
                     {/* User Info */}
-                    <div className="hidden md:flex items-center gap-3 bg-white/10 rounded-2xl px-4 py-2">
-                        <div className="w-10 h-10 bg-accent rounded-full flex items-center justify-center">
-                            <FiUser size={20} />
-                        </div>
-                        <div>
-                            <p className="text-sm font-semibold leading-tight">{user?.name || 'User'}</p>
-                            <p className="text-xs text-blue-200">{user?.role === 'admin' ? 'Administrator' : 'Pensioner'}</p>
-                        </div>
-                    </div>
+                    <div className="relative">
+                        <button
+                            onClick={() => setShowProfile(!showProfile)}
+                            className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-bg transition-all cursor-pointer border-none bg-transparent"
+                        >
+                            <div className="w-8 h-8 bg-primary/10 text-primary rounded-full flex items-center justify-center">
+                                <FiUser size={16} />
+                            </div>
+                            <span className="text-sm font-semibold text-text-dark hidden md:block">
+                                {user?.name?.split(' ')[0] || 'User'}
+                            </span>
+                        </button>
 
-                    {/* Logout */}
-                    <button
-                        onClick={handleLogout}
-                        className="btn-senior bg-white/10 text-white hover:bg-danger px-5 py-3 text-base border-none"
-                        title="Logout"
-                    >
-                        <FiLogOut size={20} className="inline mr-2" />
-                        <span className="hidden sm:inline">Logout</span>
-                    </button>
+                        {showProfile && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowProfile(false)} />
+                                <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-lg border border-border p-3 z-50 animate-slide-down">
+                                    <div className="pb-3 mb-3 border-b border-border">
+                                        <p className="font-semibold text-text-dark">{user?.name || 'User'}</p>
+                                        <p className="text-xs text-text-light">{user?.email}</p>
+                                        <span className="text-[11px] text-primary font-medium">
+                                            {user?.role === 'admin' ? '🛡️ Administrator' : '👤 Pensioner'}
+                                        </span>
+                                    </div>
+                                    <button
+                                        onClick={handleLogout}
+                                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-danger rounded-lg hover:bg-danger/5 transition-all cursor-pointer border-none bg-transparent font-medium"
+                                    >
+                                        <FiLogOut size={16} /> Sign Out
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </nav>
