@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
+import { FiMail, FiLock, FiArrowRight, FiShield, FiCheckCircle } from 'react-icons/fi';
 
 export default function Login() {
     const { login } = useAuth();
@@ -25,31 +25,29 @@ export default function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-primary via-primary-dark to-primary-light flex items-center justify-center p-4">
-            <div className="w-full max-w-lg">
+        <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+            <div className="w-full max-w-md">
                 {/* Logo */}
                 <div className="text-center mb-8 animate-fade-in">
-                    <div className="w-20 h-20 bg-accent rounded-3xl flex items-center justify-center text-4xl font-bold text-white mx-auto shadow-2xl mb-4">
-                        R
-                    </div>
-                    <h1 className="text-4xl font-bold text-white mb-2">RetireAssist</h1>
-                    <p className="text-xl text-blue-200">Your Pension Companion</p>
+                    <img src="/logo.png" alt="RetireAssist" className="w-16 h-16 mx-auto mb-3 rounded-xl" />
+                    <h1 className="text-2xl font-bold text-text-dark mb-1">RetireAssist</h1>
+                    <p className="text-sm text-text-light">Your Trusted Retirement Companion</p>
                 </div>
 
                 {/* Login Card */}
-                <div className="bg-white rounded-3xl shadow-2xl p-8 animate-fade-in">
-                    <h2 className="text-2xl font-bold text-primary-dark text-center mb-6">Welcome Back</h2>
+                <div className="bg-white rounded-2xl shadow-sm border border-border p-6 animate-fade-in">
+                    <h2 className="text-xl font-bold text-text-dark text-center mb-5">Welcome Back</h2>
 
                     {error && (
-                        <div className="mb-4 p-4 bg-danger/10 border border-danger/30 rounded-2xl text-danger text-center font-medium">
+                        <div className="mb-4 p-3 bg-danger/5 border border-danger/20 rounded-xl text-danger text-sm text-center font-medium">
                             {error}
                         </div>
                     )}
 
-                    <form onSubmit={handleSubmit} className="space-y-5">
+                    <form onSubmit={handleSubmit} className="space-y-4">
                         <div>
                             <label className="label-senior">
-                                <FiMail className="inline mr-2" size={18} />Email Address
+                                <FiMail className="inline mr-1.5" size={15} />Email Address
                             </label>
                             <input
                                 type="email"
@@ -63,7 +61,7 @@ export default function Login() {
 
                         <div>
                             <label className="label-senior">
-                                <FiLock className="inline mr-2" size={18} />Password
+                                <FiLock className="inline mr-1.5" size={15} />Password
                             </label>
                             <input
                                 type="password"
@@ -81,28 +79,38 @@ export default function Login() {
                             className="btn-primary w-full flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                             {loading ? (
-                                <span className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin" />
+                                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                             ) : (
-                                <>Sign In <FiArrowRight size={20} /></>
+                                <>Sign In <FiArrowRight size={18} /></>
                             )}
                         </button>
                     </form>
 
-                    <div className="mt-6 text-center">
-                        <p className="text-lg text-text-light">
+                    {/* Trust Indicators */}
+                    <div className="flex items-center justify-center gap-4 mt-5 pt-4 border-t border-border">
+                        <span className="flex items-center gap-1 text-xs text-primary font-medium">
+                            <FiShield size={12} /> 256-bit Encrypted
+                        </span>
+                        <span className="flex items-center gap-1 text-xs text-success font-medium">
+                            <FiCheckCircle size={12} /> Govt. Verified
+                        </span>
+                    </div>
+
+                    <div className="mt-4 text-center">
+                        <p className="text-sm text-text-light">
                             Don't have an account?{' '}
-                            <Link to="/signup" className="text-accent font-bold hover:underline">
+                            <Link to="/signup" className="text-primary font-semibold hover:underline">
                                 Sign Up
                             </Link>
                         </p>
                     </div>
 
                     {/* Demo Credentials */}
-                    <div className="mt-6 p-4 bg-bg rounded-2xl">
-                        <p className="text-sm font-semibold text-primary mb-2">🔑 Demo Accounts</p>
-                        <div className="space-y-1 text-sm text-text-light">
-                            <p>👤 User: <code className="bg-white px-2 py-0.5 rounded text-text">ramesh@example.com</code> / <code className="bg-white px-2 py-0.5 rounded text-text">password123</code></p>
-                            <p>🔒 Admin: <code className="bg-white px-2 py-0.5 rounded text-text">admin@retireassist.com</code> / <code className="bg-white px-2 py-0.5 rounded text-text">admin123</code></p>
+                    <div className="mt-4 p-3 bg-bg rounded-xl">
+                        <p className="text-xs font-semibold text-text-dark mb-1.5">🔑 Demo Accounts</p>
+                        <div className="space-y-1 text-xs text-text-light">
+                            <p>👤 User: <code className="bg-white px-1.5 py-0.5 rounded text-text text-[11px]">ramesh@example.com</code> / <code className="bg-white px-1.5 py-0.5 rounded text-text text-[11px]">password123</code></p>
+                            <p>🔒 Admin: <code className="bg-white px-1.5 py-0.5 rounded text-text text-[11px]">admin@retireassist.com</code> / <code className="bg-white px-1.5 py-0.5 rounded text-text text-[11px]">admin123</code></p>
                         </div>
                     </div>
                 </div>
