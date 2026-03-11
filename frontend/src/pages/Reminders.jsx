@@ -57,34 +57,34 @@ export default function Reminders() {
     return (
         <div>
             {/* Header */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
                 <div>
-                    <h1 className="heading-page flex items-center gap-3">
-                        <span className="text-3xl">🔔</span> Smart Reminders
+                    <h1 className="heading-page flex items-center gap-2">
+                        <span className="text-2xl">🔔</span> Smart Reminders
                     </h1>
-                    <p className="text-text-light text-lg">Never miss important pension deadlines</p>
+                    <p className="text-text-light text-sm">Never miss important pension deadlines</p>
                 </div>
-                <button onClick={() => setShowForm(!showForm)} className="btn-primary flex items-center gap-2">
-                    {showForm ? <><FiX size={20} /> Cancel</> : <><FiPlus size={20} /> Add Reminder</>}
+                <button onClick={() => setShowForm(!showForm)} className="btn-primary flex items-center gap-2 text-sm">
+                    {showForm ? <><FiX size={16} /> Cancel</> : <><FiPlus size={16} /> Add Reminder</>}
                 </button>
             </div>
 
             {/* Create Form */}
             {showForm && (
-                <div className="card mb-6 animate-fade-in">
-                    <h3 className="text-xl font-bold text-primary mb-4">📌 New Reminder</h3>
-                    <form onSubmit={handleCreate} className="space-y-4">
+                <div className="card mb-4 animate-fade-in">
+                    <h3 className="text-base font-bold text-text-dark mb-3">📌 New Reminder</h3>
+                    <form onSubmit={handleCreate} className="space-y-3">
                         <div>
                             <label className="label-senior">Title</label>
                             <input type="text" className="input-senior" placeholder="e.g., Submit Life Certificate" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
                         </div>
                         <div>
                             <label className="label-senior">Description</label>
-                            <textarea className="input-senior min-h-[100px]" placeholder="Add details..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
+                            <textarea className="input-senior min-h-[80px]" placeholder="Add details..." value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} />
                         </div>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
-                                <label className="label-senior"><FiCalendar className="inline mr-1" size={16} /> Due Date</label>
+                                <label className="label-senior"><FiCalendar className="inline mr-1" size={13} /> Due Date</label>
                                 <input type="date" className="input-senior" value={form.dueDate} onChange={e => setForm({ ...form, dueDate: e.target.value })} required />
                             </div>
                             <div>
@@ -106,18 +106,20 @@ export default function Reminders() {
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" className="btn-primary w-full">Create Reminder</button>
+                        <button type="submit" className="btn-primary w-full text-sm">Create Reminder</button>
                     </form>
                 </div>
             )}
 
             {/* Filters */}
-            <div className="flex gap-3 mb-6">
+            <div className="flex gap-2 mb-4">
                 {['all', 'pending', 'completed'].map(f => (
                     <button
                         key={f}
                         onClick={() => setFilter(f)}
-                        className={`px-6 py-3 rounded-2xl text-base font-semibold transition-all border-none cursor-pointer ${filter === f ? 'bg-accent text-white shadow-lg' : 'bg-white text-text hover:bg-bg'
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border cursor-pointer ${filter === f
+                            ? 'bg-primary text-white border-primary'
+                            : 'bg-white text-text-light border-border hover:border-primary/30'
                             }`}
                     >
                         {f === 'all' ? '📋 All' : f === 'pending' ? '⏳ Pending' : '✅ Done'} ({
@@ -129,21 +131,21 @@ export default function Reminders() {
 
             {/* Reminders List */}
             {loading ? (
-                <div className="flex justify-center py-20">
-                    <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+                <div className="flex justify-center py-16">
+                    <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin"></div>
                 </div>
             ) : filtered.length === 0 ? (
-                <div className="card text-center py-12">
-                    <p className="text-5xl mb-4">🎉</p>
-                    <h3 className="text-2xl font-bold text-text-dark mb-2">
+                <div className="card text-center py-10">
+                    <p className="text-3xl mb-3">🎉</p>
+                    <h3 className="text-lg font-bold text-text-dark mb-1">
                         {filter === 'completed' ? 'No completed reminders' : 'No reminders yet'}
                     </h3>
-                    <p className="text-lg text-text-light">
+                    <p className="text-sm text-text-light">
                         {filter === 'pending' ? 'All tasks are completed!' : 'Create your first reminder to stay on track'}
                     </p>
                 </div>
             ) : (
-                <div className="space-y-4">
+                <div className="space-y-3">
                     {filtered.map(r => (
                         <ReminderCard
                             key={r._id}

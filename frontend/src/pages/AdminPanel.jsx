@@ -39,17 +39,17 @@ export default function AdminPanel() {
 
     if (user?.role !== 'admin') {
         return (
-            <div className="card text-center py-12">
-                <p className="text-5xl mb-4">🔒</p>
-                <h2 className="text-2xl font-bold text-text-dark">Access Denied</h2>
-                <p className="text-lg text-text-light">You need admin privileges to access this panel.</p>
+            <div className="card text-center py-10">
+                <p className="text-3xl mb-3">🔒</p>
+                <h2 className="text-lg font-bold text-text-dark">Access Denied</h2>
+                <p className="text-sm text-text-light">You need admin privileges to access this panel.</p>
             </div>
         );
     }
 
     if (loading) return (
-        <div className="flex justify-center py-20">
-            <div className="w-12 h-12 border-4 border-accent border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex justify-center py-16">
+            <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin"></div>
         </div>
     );
 
@@ -67,20 +67,22 @@ export default function AdminPanel() {
 
     return (
         <div>
-            <div className="mb-6">
-                <h1 className="heading-page flex items-center gap-3">
-                    <span className="text-3xl">🛡️</span> Admin Panel
+            <div className="mb-4">
+                <h1 className="heading-page flex items-center gap-2">
+                    <span className="text-2xl">🛡️</span> Admin Panel
                 </h1>
-                <p className="text-text-light text-lg">Manage users, documents, and platform activity</p>
+                <p className="text-text-light text-sm">Manage users, documents, and platform activity</p>
             </div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+            <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-6 py-3 rounded-2xl text-base font-semibold transition-all border-none cursor-pointer whitespace-nowrap ${activeTab === tab.id ? 'bg-primary text-white shadow-lg' : 'bg-white text-text hover:bg-bg'
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border cursor-pointer whitespace-nowrap ${activeTab === tab.id
+                            ? 'bg-primary text-white border-primary'
+                            : 'bg-white text-text-light border-border hover:border-primary/30'
                             }`}
                     >
                         {tab.label}
@@ -90,27 +92,27 @@ export default function AdminPanel() {
 
             {/* Overview */}
             {activeTab === 'overview' && (
-                <div className="space-y-6 animate-fade-in">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-4 animate-fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                         <StatCard icon={FiUsers} label="Total Users" value={stats?.totalUsers || 0} color="primary" />
                         <StatCard icon={FiFileText} label="Documents" value={stats?.totalDocuments || 0} color="info" />
                         <StatCard icon={FiBell} label="Pending Reminders" value={stats?.pendingReminders || 0} color="warning" />
                         <StatCard icon={FiActivity} label="Active Users" value={stats?.activeUsers || 0} color="success" />
                     </div>
                     <div className="card">
-                        <h3 className="text-xl font-bold text-primary mb-4">📈 Platform Health</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                            <div className="p-4 bg-success/10 rounded-2xl text-center">
-                                <p className="text-2xl font-bold text-success">{stats?.platformHealth || 'Good'}</p>
-                                <p className="text-sm text-text-light">System Status</p>
+                        <h3 className="text-base font-bold text-text-dark mb-3">📈 Platform Health</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div className="p-3 bg-success/5 rounded-lg text-center">
+                                <p className="text-lg font-bold text-success">{stats?.platformHealth || 'Good'}</p>
+                                <p className="text-xs text-text-light">System Status</p>
                             </div>
-                            <div className="p-4 bg-info/10 rounded-2xl text-center">
-                                <p className="text-2xl font-bold text-info">{stats?.totalDocuments || 0}</p>
-                                <p className="text-sm text-text-light">Total Files</p>
+                            <div className="p-3 bg-info/5 rounded-lg text-center">
+                                <p className="text-lg font-bold text-info">{stats?.totalDocuments || 0}</p>
+                                <p className="text-xs text-text-light">Total Files</p>
                             </div>
-                            <div className="p-4 bg-accent/10 rounded-2xl text-center">
-                                <p className="text-2xl font-bold text-accent">{new Date(stats?.lastUpdated).toLocaleDateString('en-IN')}</p>
-                                <p className="text-sm text-text-light">Last Updated</p>
+                            <div className="p-3 bg-primary/5 rounded-lg text-center">
+                                <p className="text-lg font-bold text-primary">{new Date(stats?.lastUpdated).toLocaleDateString('en-IN')}</p>
+                                <p className="text-xs text-text-light">Last Updated</p>
                             </div>
                         </div>
                     </div>
@@ -120,12 +122,12 @@ export default function AdminPanel() {
             {/* Users */}
             {activeTab === 'users' && (
                 <div className="animate-fade-in">
-                    <div className="mb-4">
+                    <div className="mb-3">
                         <div className="relative">
-                            <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-text-light" size={20} />
+                            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light" size={16} />
                             <input
                                 type="text"
-                                className="input-senior pl-12"
+                                className="input-senior pl-10"
                                 placeholder="Search users by name or email..."
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
@@ -135,32 +137,32 @@ export default function AdminPanel() {
                     <div className="card overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                                <tr className="border-b-2 border-border">
-                                    <th className="py-4 px-3 text-base font-bold text-primary">Name</th>
-                                    <th className="py-4 px-3 text-base font-bold text-primary">Email</th>
-                                    <th className="py-4 px-3 text-base font-bold text-primary">Pension ID</th>
-                                    <th className="py-4 px-3 text-base font-bold text-primary">Status</th>
-                                    <th className="py-4 px-3 text-base font-bold text-primary">Age</th>
+                                <tr className="border-b border-border">
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Name</th>
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Email</th>
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Pension ID</th>
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Status</th>
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Age</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredUsers.map(u => (
                                     <tr key={u._id} className="border-b border-border/50 hover:bg-bg transition-all">
-                                        <td className="py-4 px-3 font-semibold">{u.name}</td>
-                                        <td className="py-4 px-3 text-text-light">{u.email}</td>
-                                        <td className="py-4 px-3">{u.pensionId || '—'}</td>
-                                        <td className="py-4 px-3">
+                                        <td className="py-3 px-3 text-sm font-semibold">{u.name}</td>
+                                        <td className="py-3 px-3 text-sm text-text-light">{u.email}</td>
+                                        <td className="py-3 px-3 text-sm">{u.pensionId || '—'}</td>
+                                        <td className="py-3 px-3">
                                             <span className={u.pensionStatus === 'active' ? 'badge-success' : 'badge-warning'}>
                                                 {u.pensionStatus || 'N/A'}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-3">{u.age || '—'}</td>
+                                        <td className="py-3 px-3 text-sm">{u.age || '—'}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                         {filteredUsers.length === 0 && (
-                            <p className="text-center text-text-light py-8">No users found</p>
+                            <p className="text-center text-text-light text-sm py-6">No users found</p>
                         )}
                     </div>
                 </div>
@@ -172,26 +174,26 @@ export default function AdminPanel() {
                     <div className="card overflow-x-auto">
                         <table className="w-full text-left">
                             <thead>
-                                <tr className="border-b-2 border-border">
-                                    <th className="py-4 px-3 text-base font-bold text-primary">User</th>
-                                    <th className="py-4 px-3 text-base font-bold text-primary">Type</th>
-                                    <th className="py-4 px-3 text-base font-bold text-primary">File</th>
-                                    <th className="py-4 px-3 text-base font-bold text-primary">Status</th>
-                                    <th className="py-4 px-3 text-base font-bold text-primary">Uploaded</th>
+                                <tr className="border-b border-border">
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">User</th>
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Type</th>
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">File</th>
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Status</th>
+                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Uploaded</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {documents.map(d => (
                                     <tr key={d._id} className="border-b border-border/50 hover:bg-bg transition-all">
-                                        <td className="py-4 px-3 font-semibold">{d.userId?.name || 'Unknown'}</td>
-                                        <td className="py-4 px-3">{d.documentType}</td>
-                                        <td className="py-4 px-3 text-text-light">{d.fileName}</td>
-                                        <td className="py-4 px-3">
+                                        <td className="py-3 px-3 text-sm font-semibold">{d.userId?.name || 'Unknown'}</td>
+                                        <td className="py-3 px-3 text-sm">{d.documentType}</td>
+                                        <td className="py-3 px-3 text-sm text-text-light">{d.fileName}</td>
+                                        <td className="py-3 px-3">
                                             <span className={d.status === 'verified' ? 'badge-success' : 'badge-warning'}>
                                                 {d.status}
                                             </span>
                                         </td>
-                                        <td className="py-4 px-3 text-text-light">
+                                        <td className="py-3 px-3 text-sm text-text-light">
                                             {new Date(d.uploadedAt).toLocaleDateString('en-IN')}
                                         </td>
                                     </tr>
@@ -199,7 +201,7 @@ export default function AdminPanel() {
                             </tbody>
                         </table>
                         {documents.length === 0 && (
-                            <p className="text-center text-text-light py-8">No documents found</p>
+                            <p className="text-center text-text-light text-sm py-6">No documents found</p>
                         )}
                     </div>
                 </div>
@@ -208,13 +210,13 @@ export default function AdminPanel() {
             {/* Announcements */}
             {activeTab === 'announcements' && (
                 <div className="card animate-fade-in">
-                    <h3 className="text-xl font-bold text-primary mb-4">📢 Send Announcement</h3>
+                    <h3 className="text-base font-bold text-text-dark mb-3">📢 Send Announcement</h3>
                     {announcementSent && (
-                        <div className="mb-4 p-4 bg-success/10 border border-success/30 rounded-2xl text-success font-semibold">
+                        <div className="mb-3 p-3 bg-success/5 border border-success/20 rounded-lg text-success text-sm font-medium">
                             ✅ Announcement sent successfully to all users!
                         </div>
                     )}
-                    <form onSubmit={sendAnnouncement} className="space-y-4">
+                    <form onSubmit={sendAnnouncement} className="space-y-3">
                         <div>
                             <label className="label-senior">Title</label>
                             <input
@@ -229,15 +231,15 @@ export default function AdminPanel() {
                         <div>
                             <label className="label-senior">Message</label>
                             <textarea
-                                className="input-senior min-h-[150px]"
+                                className="input-senior min-h-[120px]"
                                 placeholder="Type your announcement message..."
                                 value={announcement.message}
                                 onChange={e => setAnnouncement({ ...announcement, message: e.target.value })}
                                 required
                             />
                         </div>
-                        <button type="submit" className="btn-primary flex items-center gap-2">
-                            <FiSend size={20} /> Send to All Users
+                        <button type="submit" className="btn-primary flex items-center gap-2 text-sm">
+                            <FiSend size={16} /> Send to All Users
                         </button>
                     </form>
                 </div>
