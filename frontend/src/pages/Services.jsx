@@ -1,150 +1,116 @@
-import ServiceCard from '../components/ServiceCard';
+import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { BookOpen, Landmark, FileText, Building2, Shield, CreditCard, Fingerprint, ChevronDown, ChevronUp, ExternalLink, Phone } from 'lucide-react';
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
 
 const services = [
     {
-        icon: '📋',
-        title: 'Submit Life Certificate',
-        subtitle: 'Annual Jeevan Pramaan submission',
-        category: 'Government',
-        steps: [
-            'Download the "Jeevan Pramaan" app from Play Store or App Store',
-            'Open the app and select "New Registration"',
-            'Enter your Aadhaar number and pension details (PPO number, pension account, bank name)',
-            'Complete biometric verification using your fingerprint',
-            'Your Digital Life Certificate will be generated instantly',
-            'The certificate is automatically sent to your pension disbursing agency',
-            'Save the acknowledgement number for your records'
-        ],
-        helpline: '1800-11-1960 (Toll-free)',
-        website: 'https://jeevanpramaan.gov.in'
+        icon: Landmark, title: 'Pension Application', category: 'Government', gradient: 'from-blue-500 to-cyan-400',
+        steps: ['Visit pension.gov.in or RetireAssist portal', 'Fill basic details — PPO No., PAN, Aadhaar', 'Upload supporting documents', 'Submit and track status'],
+        helpline: '1800-11-1960', website: 'https://pension.gov.in'
     },
     {
-        icon: '🏦',
-        title: 'Update Bank Details',
-        subtitle: 'Change your pension bank account',
-        category: 'Financial',
-        steps: [
-            'Get a letter from your new bank confirming your account details',
-            'Write an application to your Pension Disbursing Authority (PDA)',
-            'Attach copy of new bank passbook (first page) and cancelled cheque',
-            'Include copy of PPO (Pension Payment Order) and Aadhaar card',
-            'Submit at your pension office or send by registered post',
-            'Wait 30-45 days for the change to be processed',
-            'Important: Do not close old account until pension appears in new account'
-        ],
-        helpline: '1800-11-1960 (Toll-free)'
+        icon: FileText, title: 'Life Certificate (Jeevan Pramaan)', category: 'Government', gradient: 'from-emerald-500 to-teal-400',
+        steps: ['Download Jeevan Pramaan app or use biometric device', 'Enter Aadhaar and pension details', 'Authenticate using fingerprint/iris scan', 'Certificate generated digitally'],
+        helpline: '1800-11-1960', website: 'https://jeevanpramaan.gov.in'
     },
     {
-        icon: '📝',
-        title: 'Apply for Pension Correction',
-        subtitle: 'Fix errors in pension records',
-        category: 'Government',
-        steps: [
-            'Identify the error in your PPO (name, DOB, service period, etc.)',
-            'Write a formal application to the Head of your pension office',
-            'Mention your PPO number, Pension ID, and clearly state what needs correction',
-            'Attach service records showing the correct information',
-            'Include identity proof and any other supporting documents',
-            'Submit at pension office or online at cpengrams.gov.in',
-            'Processing takes 60-90 days — keep your acknowledgment receipt safe'
-        ],
-        helpline: '1800-11-1960 (Toll-free)',
-        website: 'https://cpengrams.gov.in'
+        icon: Building2, title: 'Income Tax Filing (ITR)', category: 'Financial', gradient: 'from-purple-500 to-violet-400',
+        steps: ['Gather Form 16, bank statements, investment proofs', 'Login to incometax.gov.in', 'Choose ITR form based on income sources', 'Fill details and verify using Aadhaar OTP'],
+        helpline: '1800-180-1961', website: 'https://incometax.gov.in'
     },
     {
-        icon: '💰',
-        title: 'Check Pension Payment Status',
-        subtitle: 'Track your pension credits',
-        category: 'Financial',
-        steps: [
-            'Log in to your bank\'s internet banking or mobile app',
-            'Check recent transactions for pension credit entries',
-            'Alternatively, visit your bank branch with passbook for update',
-            'For central govt pensioners, check at pfms.nic.in',
-            'You can also call your bank\'s customer care with your account number',
-            'If pension is delayed, contact pension disbursing office with PPO number'
-        ],
-        helpline: '1800-11-1960 (Toll-free)',
-        website: 'https://pfms.nic.in'
+        icon: Shield, title: 'Insurance Claim', category: 'Healthcare', gradient: 'from-orange-400 to-rose-400',
+        steps: ['Collect medical bills, discharge summary', 'Fill insurance claim form from provider', 'Upload all documents', 'Track claim status with reference number'],
+        helpline: '155255', website: 'https://irdai.gov.in'
     },
     {
-        icon: '🏥',
-        title: 'Apply for CGHS Card',
-        subtitle: 'Healthcare benefits for pensioners',
-        category: 'Healthcare',
-        steps: [
-            'Visit your nearest CGHS (Central Government Health Scheme) wellness centre',
-            'Fill Form A (available at CGHS office or download from cghs.gov.in)',
-            'Submit: PPO copy, Aadhaar card, 2 passport photos, latest pension slip',
-            'Pay annual contribution (₹500-₹1000 based on pension amount)',
-            'Biometric enrollment will be done at the centre',
-            'CGHS card will be issued within 15-30 working days',
-            'Carry your CGHS card for all hospital visits and medical purchases'
-        ],
-        helpline: '1800-11-0077 (CGHS Helpline)',
-        website: 'https://cghs.gov.in'
+        icon: CreditCard, title: 'Bank Account Update', category: 'Financial', gradient: 'from-pink-500 to-fuchsia-400',
+        steps: ['Request bank account update from pension office', 'Submit cancelled cheque of new account', 'Provide Aadhaar-linked verification', 'Wait for confirmation (15-30 days)'],
+        helpline: '1800-11-1960', website: 'https://pension.gov.in'
     },
     {
-        icon: '📊',
-        title: 'Apply for Pension Revision',
-        subtitle: 'Get revised pension as per latest pay commission',
-        category: 'Government',
-        steps: [
-            'Check if your pension has been revised as per the latest Pay Commission',
-            'Compare your current pension with the revised rates available on your dept website',
-            'If not revised, write to your pension sanctioning authority',
-            'Attach your PPO, last pay slip, and retirement order',
-            'Mention the Pay Commission order number and expected revised amount',
-            'Submit at your pension office or through the department\'s online portal',
-            'Follow up after 30 days if no response received'
-        ],
-        helpline: '1800-11-1960 (Toll-free)'
-    }
+        icon: Fingerprint, title: 'Aadhaar Update', category: 'Government', gradient: 'from-sky-500 to-blue-400',
+        steps: ['Visit nearest Aadhaar centre or go online', 'Select type of update (address, mobile, name)', 'Submit supporting documents', 'Collect update receipt and track'],
+        helpline: '1947', website: 'https://uidai.gov.in'
+    },
 ];
 
 export default function Services() {
+    const [expandedIndex, setExpandedIndex] = useState(null);
+    const [filterCategory, setFilterCategory] = useState('All');
+
+    const categories = ['All', 'Government', 'Financial', 'Healthcare'];
+    const filtered = filterCategory === 'All' ? services : services.filter(s => s.category === filterCategory);
+
     return (
-        <div>
-            {/* Header */}
-            <div className="mb-4">
-                <h1 className="heading-page flex items-center gap-2">
-                    <span className="text-2xl">📚</span> Services Guide
-                </h1>
-                <p className="text-text-light text-sm">Step-by-step instructions for common retirement tasks</p>
-            </div>
+        <motion.div initial="hidden" animate="visible" variants={stagger}>
+            <motion.div variants={fadeUp} className="mb-5">
+                <h1 className="text-2xl font-bold text-text-dark flex items-center gap-2"><BookOpen size={24} /> Services Guide</h1>
+                <p className="text-sm text-text-light mt-0.5">Step-by-step guides for government and financial services</p>
+            </motion.div>
 
-            {/* Info Banner */}
-            <div className="flex items-start gap-3 p-3 bg-info/5 border border-info/10 rounded-lg mb-4">
-                <span className="text-lg flex-shrink-0">💡</span>
-                <div>
-                    <h3 className="text-sm font-bold text-text-dark">How to Use This Guide</h3>
-                    <p className="text-xs text-text-light">Click on any service card below to expand and see step-by-step instructions. Each card includes helpline numbers and official website links.</p>
-                </div>
-            </div>
-
-            {/* Services List */}
-            <div className="space-y-3">
-                {services.map((service, i) => (
-                    <ServiceCard key={i} service={service} />
+            <motion.div variants={fadeUp} className="flex gap-2 mb-5">
+                {categories.map(c => (
+                    <button key={c} onClick={() => setFilterCategory(c)}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium border cursor-pointer transition-all ${filterCategory === c ? 'bg-gradient-to-r from-primary to-secondary text-white border-transparent' : 'bg-white text-text-light border-border hover:border-primary/30'}`}>
+                        {c}
+                    </button>
                 ))}
-            </div>
+            </motion.div>
 
-            {/* Emergency Contact */}
-            <div className="card mt-4 bg-danger/5 border-danger/10">
-                <h3 className="text-base font-bold text-danger mb-3">📞 Emergency Helpline Numbers</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="p-3 bg-white rounded-lg">
-                        <p className="text-sm font-bold">🏛️ Pension Helpline</p>
-                        <p className="text-xl font-bold text-primary">1800-11-1960</p>
-                        <p className="text-xs text-text-light">Toll-free, Mon-Sat, 9AM-6PM</p>
-                    </div>
-                    <div className="p-3 bg-white rounded-lg">
-                        <p className="text-sm font-bold">🏥 CGHS Helpline</p>
-                        <p className="text-xl font-bold text-primary">1800-11-0077</p>
-                        <p className="text-xs text-text-light">Toll-free, Mon-Fri, 9AM-5PM</p>
-                    </div>
+            <motion.div variants={stagger} className="space-y-3">
+                {filtered.map((service, i) => (
+                    <motion.div key={i} variants={fadeUp} className="card hover:border-primary/20">
+                        <div onClick={() => setExpandedIndex(expandedIndex === i ? null : i)} className="flex items-center gap-4 cursor-pointer">
+                            <div className={`w-11 h-11 bg-gradient-to-br ${service.gradient} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                                <service.icon size={22} className="text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <h3 className="font-bold text-text-dark text-sm">{service.title}</h3>
+                                <span className="badge badge-primary text-[10px]">{service.category}</span>
+                            </div>
+                            {expandedIndex === i ? <ChevronUp size={18} className="text-text-muted" /> : <ChevronDown size={18} className="text-text-muted" />}
+                        </div>
+
+                        {expandedIndex === i && (
+                            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-4 pt-4 border-t border-border">
+                                <h4 className="text-sm font-semibold text-text-dark mb-3">📝 Step-by-Step Guide</h4>
+                                <div className="space-y-2 mb-4">
+                                    {service.steps.map((step, j) => (
+                                        <div key={j} className="flex items-start gap-3 p-2 bg-bg rounded-lg">
+                                            <span className="w-6 h-6 bg-gradient-to-br from-primary to-secondary text-white rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0">{j + 1}</span>
+                                            <p className="text-sm text-text-light">{step}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex flex-wrap items-center gap-3 text-sm">
+                                    <a href={service.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-primary-light font-medium hover:underline no-underline">
+                                        <ExternalLink size={14} /> Official Website
+                                    </a>
+                                    <a href={`tel:${service.helpline}`} className="flex items-center gap-1 text-accent font-medium hover:underline no-underline">
+                                        <Phone size={14} /> Helpline: {service.helpline}
+                                    </a>
+                                </div>
+                            </motion.div>
+                        )}
+                    </motion.div>
+                ))}
+            </motion.div>
+
+            {/* Emergency */}
+            <motion.div variants={fadeUp} className="card mt-5 bg-gradient-to-r from-primary to-secondary text-white">
+                <h3 className="font-bold mb-2">📞 Emergency Helplines</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {[['Pension Helpline', '1800-11-1960'], ['Income Tax', '1800-180-1961'], ['UIDAI', '1947']].map(([label, num]) => (
+                        <a key={num} href={`tel:${num}`} className="flex items-center gap-2 p-2 bg-white/10 rounded-lg text-white no-underline hover:bg-white/20 transition-all">
+                            <Phone size={14} /> <span className="text-sm"><strong>{label}</strong><br />{num}</span>
+                        </a>
+                    ))}
                 </div>
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 }

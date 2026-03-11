@@ -1,249 +1,190 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import StatCard from '../components/StatCard';
-import { FiUsers, FiFileText, FiBell, FiActivity, FiSend, FiSearch } from 'react-icons/fi';
+import { motion } from 'framer-motion';
+import { Shield, Users, FileText, CheckCircle, Clock, Search, Send, Bell, Eye, BarChart3, Megaphone } from 'lucide-react';
+
+const fadeUp = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+const stagger = { visible: { transition: { staggerChildren: 0.08 } } };
+
+const gradients = [
+    'bg-gradient-to-br from-blue-500 to-cyan-400',
+    'bg-gradient-to-br from-emerald-500 to-teal-400',
+    'bg-gradient-to-br from-violet-500 to-purple-400',
+    'bg-gradient-to-br from-orange-400 to-rose-400',
+];
 
 export default function AdminPanel() {
-    const { API, user } = useAuth();
-    const [stats, setStats] = useState(null);
+    const { API } = useAuth();
+    const [tab, setTab] = useState('overview');
     const [users, setUsers] = useState([]);
-    const [documents, setDocuments] = useState([]);
+    const [docs, setDocs] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState('overview');
+    const [search, setSearch] = useState('');
     const [announcement, setAnnouncement] = useState({ title: '', message: '' });
-    const [announcementSent, setAnnouncementSent] = useState(false);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [stats, setStats] = useState({ totalUsers: 0, activeRequests: 0, completedTasks: 0, pendingVerification: 0 });
 
     useEffect(() => {
-        if (user?.role !== 'admin') return;
         Promise.all([
-            API.get('/admin/stats').catch(() => ({ data: null })),
             API.get('/admin/users').catch(() => ({ data: [] })),
             API.get('/admin/documents').catch(() => ({ data: [] })),
-        ]).then(([s, u, d]) => {
-            setStats(s.data);
+            API.get('/admin/stats').catch(() => ({ data: {} })),
+        ]).then(([u, d, s]) => {
             setUsers(u.data || []);
-            setDocuments(d.data || []);
+            setDocs(d.data || []);
+            setStats({ totalUsers: (u.data || []).length, activeRequests: (d.data || []).filter(x => x.status !== 'verified').length, completedTasks: (d.data || []).filter(x => x.status === 'verified').length, pendingVerification: (d.data || []).filter(x => x.status === 'pending').length, ...s.data });
         }).finally(() => setLoading(false));
     }, []);
 
-    const sendAnnouncement = async (e) => {
-        e.preventDefault();
-        try {
-            await API.post('/admin/announcements', announcement);
-            setAnnouncementSent(true);
-            setAnnouncement({ title: '', message: '' });
-            setTimeout(() => setAnnouncementSent(false), 3000);
-        } catch { }
-    };
+    const updateDocStatus = async (id, status) => { try { await API.put(`/admin/documents/${id}`, { status }); setDocs(d => d.map(x => x._id === id ? { ...x, status } : x)); } catch { } };
+    const filteredUsers = users.filter(u => u.name?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase()));
 
-    if (user?.role !== 'admin') {
-        return (
-            <div className="card text-center py-10">
-                <p className="text-3xl mb-3">🔒</p>
-                <h2 className="text-lg font-bold text-text-dark">Access Denied</h2>
-                <p className="text-sm text-text-light">You need admin privileges to access this panel.</p>
-            </div>
-        );
-    }
-
-    if (loading) return (
-        <div className="flex justify-center py-16">
-            <div className="w-10 h-10 border-3 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-    );
-
-    const filteredUsers = users.filter(u =>
-        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const statCards = [
+        { icon: Users, label: 'Total Users', value: stats.totalUsers, gradient: gradients[0] },
+        { icon: Send, label: 'Active Requests', value: stats.activeRequests, gradient: gradients[1] },
+        { icon: CheckCircle, label: 'Completed Tasks', value: stats.completedTasks, gradient: gradients[2] },
+        { icon: Clock, label: 'Pending Verification', value: stats.pendingVerification, gradient: gradients[3] },
+    ];
 
     const tabs = [
-        { id: 'overview', label: '📊 Overview' },
-        { id: 'users', label: '👥 Users' },
-        { id: 'documents', label: '📄 Documents' },
-        { id: 'announcements', label: '📢 Announcements' },
+        { id: 'overview', label: 'Overview', icon: BarChart3 },
+        { id: 'users', label: 'Users', icon: Users },
+        { id: 'documents', label: 'Documents', icon: FileText },
+        { id: 'announcements', label: 'Announcements', icon: Megaphone },
     ];
 
     return (
-        <div>
-            <div className="mb-4">
-                <h1 className="heading-page flex items-center gap-2">
-                    <span className="text-2xl">🛡️</span> Admin Panel
-                </h1>
-                <p className="text-text-light text-sm">Manage users, documents, and platform activity</p>
-            </div>
+        <motion.div initial="hidden" animate="visible" variants={stagger}>
+            <motion.div variants={fadeUp} className="flex items-center gap-2 mb-5">
+                <Shield size={24} className="text-primary" />
+                <div>
+                    <h1 className="text-2xl font-bold text-text-dark">Admin Panel</h1>
+                    <p className="text-sm text-text-light">Manage users, documents, and platform services</p>
+                </div>
+            </motion.div>
 
             {/* Tabs */}
-            <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
-                {tabs.map(tab => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all border cursor-pointer whitespace-nowrap ${activeTab === tab.id
-                            ? 'bg-primary text-white border-primary'
-                            : 'bg-white text-text-light border-border hover:border-primary/30'
-                            }`}
-                    >
-                        {tab.label}
+            <motion.div variants={fadeUp} className="flex gap-1 mb-5 bg-bg rounded-xl p-1 border border-border">
+                {tabs.map(t => (
+                    <button key={t.id} onClick={() => setTab(t.id)}
+                        className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-medium cursor-pointer border-none transition-all ${tab === t.id ? 'bg-gradient-to-r from-primary to-secondary text-white shadow-sm' : 'bg-transparent text-text-light hover:text-text'}`}>
+                        <t.icon size={15} /> {t.label}
                     </button>
                 ))}
-            </div>
+            </motion.div>
 
             {/* Overview */}
-            {activeTab === 'overview' && (
-                <div className="space-y-4 animate-fade-in">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                        <StatCard icon={FiUsers} label="Total Users" value={stats?.totalUsers || 0} color="primary" />
-                        <StatCard icon={FiFileText} label="Documents" value={stats?.totalDocuments || 0} color="info" />
-                        <StatCard icon={FiBell} label="Pending Reminders" value={stats?.pendingReminders || 0} color="warning" />
-                        <StatCard icon={FiActivity} label="Active Users" value={stats?.activeUsers || 0} color="success" />
+            {tab === 'overview' && (
+                <motion.div variants={stagger}>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+                        {statCards.map((s, i) => (
+                            <motion.div key={i} variants={fadeUp} className={`${s.gradient} card-gradient p-5 rounded-xl`}>
+                                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mb-3">
+                                    <s.icon size={20} className="text-white" />
+                                </div>
+                                <p className="text-3xl font-bold text-white">{s.value}</p>
+                                <p className="text-sm text-white/80 mt-0.5">{s.label}</p>
+                            </motion.div>
+                        ))}
                     </div>
-                    <div className="card">
-                        <h3 className="text-base font-bold text-text-dark mb-3">📈 Platform Health</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div className="p-3 bg-success/5 rounded-lg text-center">
-                                <p className="text-lg font-bold text-success">{stats?.platformHealth || 'Good'}</p>
-                                <p className="text-xs text-text-light">System Status</p>
-                            </div>
-                            <div className="p-3 bg-info/5 rounded-lg text-center">
-                                <p className="text-lg font-bold text-info">{stats?.totalDocuments || 0}</p>
-                                <p className="text-xs text-text-light">Total Files</p>
-                            </div>
-                            <div className="p-3 bg-primary/5 rounded-lg text-center">
-                                <p className="text-lg font-bold text-primary">{new Date(stats?.lastUpdated).toLocaleDateString('en-IN')}</p>
-                                <p className="text-xs text-text-light">Last Updated</p>
-                            </div>
+                    <motion.div variants={fadeUp} className="card">
+                        <h3 className="font-bold text-text-dark mb-3">Recent Users</h3>
+                        <div className="space-y-2">
+                            {users.slice(0, 5).map(u => (
+                                <div key={u._id} className="flex items-center gap-3 p-3 bg-bg rounded-lg">
+                                    <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white text-xs font-bold">
+                                        {u.name?.charAt(0)}
+                                    </div>
+                                    <div className="flex-1 min-w-0">
+                                        <p className="text-sm font-semibold text-text-dark">{u.name}</p>
+                                        <p className="text-xs text-text-muted">{u.email}</p>
+                                    </div>
+                                    <span className={`badge ${u.role === 'admin' ? 'badge-primary' : 'badge-info'}`}>{u.role}</span>
+                                </div>
+                            ))}
                         </div>
-                    </div>
-                </div>
+                    </motion.div>
+                </motion.div>
             )}
 
             {/* Users */}
-            {activeTab === 'users' && (
-                <div className="animate-fade-in">
-                    <div className="mb-3">
-                        <div className="relative">
-                            <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light" size={16} />
-                            <input
-                                type="text"
-                                className="input-senior pl-10"
-                                placeholder="Search users by name or email..."
-                                value={searchTerm}
-                                onChange={e => setSearchTerm(e.target.value)}
-                            />
+            {tab === 'users' && (
+                <motion.div variants={fadeUp}>
+                    <div className="card">
+                        <div className="flex items-center gap-3 mb-4">
+                            <div className="flex items-center gap-2 bg-bg rounded-lg px-3 py-2 flex-1">
+                                <Search size={16} className="text-text-muted" />
+                                <input type="text" className="bg-transparent border-none outline-none text-sm w-full" placeholder="Search users..." value={search} onChange={e => setSearch(e.target.value)} />
+                            </div>
+                        </div>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead><tr className="border-b border-border">
+                                    <th className="text-left py-3 px-3 text-xs font-semibold text-text-muted uppercase">Name</th>
+                                    <th className="text-left py-3 px-3 text-xs font-semibold text-text-muted uppercase">Email</th>
+                                    <th className="text-left py-3 px-3 text-xs font-semibold text-text-muted uppercase">Role</th>
+                                    <th className="text-left py-3 px-3 text-xs font-semibold text-text-muted uppercase">Pension ID</th>
+                                    <th className="text-left py-3 px-3 text-xs font-semibold text-text-muted uppercase">Actions</th>
+                                </tr></thead>
+                                <tbody>
+                                    {filteredUsers.map(u => (
+                                        <tr key={u._id} className="border-b border-border/60 hover:bg-bg transition-colors">
+                                            <td className="py-3 px-3 font-medium">{u.name}</td>
+                                            <td className="py-3 px-3 text-text-light">{u.email}</td>
+                                            <td className="py-3 px-3"><span className={`badge ${u.role === 'admin' ? 'badge-primary' : 'badge-info'}`}>{u.role}</span></td>
+                                            <td className="py-3 px-3 text-text-muted font-mono text-xs">{u.pensionId || '—'}</td>
+                                            <td className="py-3 px-3"><button className="btn-ghost !px-2 !py-1 !min-h-0 text-xs"><Eye size={12} /> View</button></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div className="card overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="border-b border-border">
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Name</th>
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Email</th>
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Pension ID</th>
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Status</th>
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Age</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredUsers.map(u => (
-                                    <tr key={u._id} className="border-b border-border/50 hover:bg-bg transition-all">
-                                        <td className="py-3 px-3 text-sm font-semibold">{u.name}</td>
-                                        <td className="py-3 px-3 text-sm text-text-light">{u.email}</td>
-                                        <td className="py-3 px-3 text-sm">{u.pensionId || '—'}</td>
-                                        <td className="py-3 px-3">
-                                            <span className={u.pensionStatus === 'active' ? 'badge-success' : 'badge-warning'}>
-                                                {u.pensionStatus || 'N/A'}
-                                            </span>
-                                        </td>
-                                        <td className="py-3 px-3 text-sm">{u.age || '—'}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {filteredUsers.length === 0 && (
-                            <p className="text-center text-text-light text-sm py-6">No users found</p>
-                        )}
-                    </div>
-                </div>
+                </motion.div>
             )}
 
             {/* Documents */}
-            {activeTab === 'documents' && (
-                <div className="animate-fade-in">
-                    <div className="card overflow-x-auto">
-                        <table className="w-full text-left">
-                            <thead>
-                                <tr className="border-b border-border">
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">User</th>
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Type</th>
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">File</th>
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Status</th>
-                                    <th className="py-3 px-3 text-xs font-bold text-text-light uppercase">Uploaded</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {documents.map(d => (
-                                    <tr key={d._id} className="border-b border-border/50 hover:bg-bg transition-all">
-                                        <td className="py-3 px-3 text-sm font-semibold">{d.userId?.name || 'Unknown'}</td>
-                                        <td className="py-3 px-3 text-sm">{d.documentType}</td>
-                                        <td className="py-3 px-3 text-sm text-text-light">{d.fileName}</td>
-                                        <td className="py-3 px-3">
-                                            <span className={d.status === 'verified' ? 'badge-success' : 'badge-warning'}>
-                                                {d.status}
-                                            </span>
-                                        </td>
-                                        <td className="py-3 px-3 text-sm text-text-light">
-                                            {new Date(d.uploadedAt).toLocaleDateString('en-IN')}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        {documents.length === 0 && (
-                            <p className="text-center text-text-light text-sm py-6">No documents found</p>
-                        )}
+            {tab === 'documents' && (
+                <motion.div variants={fadeUp}>
+                    <div className="card">
+                        <h3 className="font-bold text-text-dark mb-4">Document Review</h3>
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                                <thead><tr className="border-b border-border">
+                                    <th className="text-left py-3 px-3 text-xs font-semibold text-text-muted uppercase">Type</th>
+                                    <th className="text-left py-3 px-3 text-xs font-semibold text-text-muted uppercase">User</th>
+                                    <th className="text-left py-3 px-3 text-xs font-semibold text-text-muted uppercase">Status</th>
+                                    <th className="text-left py-3 px-3 text-xs font-semibold text-text-muted uppercase">Actions</th>
+                                </tr></thead>
+                                <tbody>
+                                    {docs.map(d => (
+                                        <tr key={d._id} className="border-b border-border/60 hover:bg-bg transition-colors">
+                                            <td className="py-3 px-3 font-medium">{d.type?.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+                                            <td className="py-3 px-3 text-text-light">{d.userId?.name || '—'}</td>
+                                            <td className="py-3 px-3"><span className={`badge ${d.status === 'verified' ? 'badge-success' : d.status === 'processing' ? 'badge-warning' : 'badge-info'}`}>{d.status}</span></td>
+                                            <td className="py-3 px-3 flex gap-2">
+                                                <button onClick={() => updateDocStatus(d._id, 'verified')} className="btn-ghost !px-2 !py-1 !min-h-0 text-xs !text-accent"><CheckCircle size={12} /> Verify</button>
+                                                <button onClick={() => updateDocStatus(d._id, 'rejected')} className="btn-ghost !px-2 !py-1 !min-h-0 text-xs !text-danger">Reject</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
+                </motion.div>
             )}
 
             {/* Announcements */}
-            {activeTab === 'announcements' && (
-                <div className="card animate-fade-in">
-                    <h3 className="text-base font-bold text-text-dark mb-3">📢 Send Announcement</h3>
-                    {announcementSent && (
-                        <div className="mb-3 p-3 bg-success/5 border border-success/20 rounded-lg text-success text-sm font-medium">
-                            ✅ Announcement sent successfully to all users!
-                        </div>
-                    )}
-                    <form onSubmit={sendAnnouncement} className="space-y-3">
-                        <div>
-                            <label className="label-senior">Title</label>
-                            <input
-                                type="text"
-                                className="input-senior"
-                                placeholder="Announcement title..."
-                                value={announcement.title}
-                                onChange={e => setAnnouncement({ ...announcement, title: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="label-senior">Message</label>
-                            <textarea
-                                className="input-senior min-h-[120px]"
-                                placeholder="Type your announcement message..."
-                                value={announcement.message}
-                                onChange={e => setAnnouncement({ ...announcement, message: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <button type="submit" className="btn-primary flex items-center gap-2 text-sm">
-                            <FiSend size={16} /> Send to All Users
-                        </button>
+            {tab === 'announcements' && (
+                <motion.div variants={fadeUp} className="card max-w-xl">
+                    <h3 className="font-bold text-text-dark mb-4 flex items-center gap-2"><Megaphone size={18} className="text-warning" /> Broadcast Announcement</h3>
+                    <form onSubmit={(e) => { e.preventDefault(); setAnnouncement({ title: '', message: '' }); }} className="space-y-3">
+                        <div><label className="label">Title</label><input className="input" placeholder="Announcement title" value={announcement.title} onChange={e => setAnnouncement({ ...announcement, title: e.target.value })} required /></div>
+                        <div><label className="label">Message</label><textarea className="input min-h-[100px]" placeholder="Write your announcement..." value={announcement.message} onChange={e => setAnnouncement({ ...announcement, message: e.target.value })} required /></div>
+                        <button type="submit" className="btn-primary"><Bell size={16} /> Send Announcement</button>
                     </form>
-                </div>
+                </motion.div>
             )}
-        </div>
+        </motion.div>
     );
 }
