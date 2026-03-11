@@ -5,6 +5,7 @@ const services = [
         icon: '📋',
         title: 'Submit Life Certificate',
         subtitle: 'Annual Jeevan Pramaan submission',
+        category: 'Government',
         steps: [
             'Download the "Jeevan Pramaan" app from Play Store or App Store',
             'Open the app and select "New Registration"',
@@ -21,6 +22,7 @@ const services = [
         icon: '🏦',
         title: 'Update Bank Details',
         subtitle: 'Change your pension bank account',
+        category: 'Financial',
         steps: [
             'Get a letter from your new bank confirming your account details',
             'Write an application to your Pension Disbursing Authority (PDA)',
@@ -36,6 +38,7 @@ const services = [
         icon: '📝',
         title: 'Apply for Pension Correction',
         subtitle: 'Fix errors in pension records',
+        category: 'Government',
         steps: [
             'Identify the error in your PPO (name, DOB, service period, etc.)',
             'Write a formal application to the Head of your pension office',
@@ -52,6 +55,7 @@ const services = [
         icon: '💰',
         title: 'Check Pension Payment Status',
         subtitle: 'Track your pension credits',
+        category: 'Financial',
         steps: [
             'Log in to your bank\'s internet banking or mobile app',
             'Check recent transactions for pension credit entries',
@@ -67,6 +71,7 @@ const services = [
         icon: '🏥',
         title: 'Apply for CGHS Card',
         subtitle: 'Healthcare benefits for pensioners',
+        category: 'Healthcare',
         steps: [
             'Visit your nearest CGHS (Central Government Health Scheme) wellness centre',
             'Fill Form A (available at CGHS office or download from cghs.gov.in)',
@@ -83,6 +88,7 @@ const services = [
         icon: '📊',
         title: 'Apply for Pension Revision',
         subtitle: 'Get revised pension as per latest pay commission',
+        category: 'Government',
         steps: [
             'Check if your pension has been revised as per the latest Pay Commission',
             'Compare your current pension with the revised rates available on your dept website',
@@ -100,44 +106,42 @@ export default function Services() {
     return (
         <div>
             {/* Header */}
-            <div className="mb-6">
-                <h1 className="heading-page flex items-center gap-3">
-                    <span className="text-3xl">📚</span> Government Services Guide
+            <div className="mb-4">
+                <h1 className="heading-page flex items-center gap-2">
+                    <span className="text-2xl">📚</span> Services Guide
                 </h1>
-                <p className="text-text-light text-lg">Step-by-step instructions for common retirement tasks</p>
+                <p className="text-text-light text-sm">Step-by-step instructions for common retirement tasks</p>
             </div>
 
             {/* Info Banner */}
-            <div className="bg-gradient-to-r from-info/10 to-primary/10 rounded-3xl p-6 mb-6 border border-info/20">
-                <div className="flex items-start gap-4">
-                    <span className="text-3xl">💡</span>
-                    <div>
-                        <h3 className="text-lg font-bold text-primary">How to Use This Guide</h3>
-                        <p className="text-base text-text-light">Click on any service card below to expand and see step-by-step instructions. Each card includes helpline numbers and official website links for your convenience.</p>
-                    </div>
+            <div className="flex items-start gap-3 p-3 bg-info/5 border border-info/10 rounded-lg mb-4">
+                <span className="text-lg flex-shrink-0">💡</span>
+                <div>
+                    <h3 className="text-sm font-bold text-text-dark">How to Use This Guide</h3>
+                    <p className="text-xs text-text-light">Click on any service card below to expand and see step-by-step instructions. Each card includes helpline numbers and official website links.</p>
                 </div>
             </div>
 
-            {/* Services Grid */}
-            <div className="space-y-4">
+            {/* Services List */}
+            <div className="space-y-3">
                 {services.map((service, i) => (
                     <ServiceCard key={i} service={service} />
                 ))}
             </div>
 
             {/* Emergency Contact */}
-            <div className="card mt-6 bg-gradient-to-r from-danger/5 to-warning/5 border border-danger/20">
-                <h3 className="text-xl font-bold text-danger mb-3">📞 Emergency Helpline Numbers</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="p-4 bg-white rounded-xl">
-                        <p className="font-bold">🏛️ Pension Helpline</p>
-                        <p className="text-2xl font-bold text-primary">1800-11-1960</p>
-                        <p className="text-sm text-text-light">Toll-free, Mon-Sat, 9AM-6PM</p>
+            <div className="card mt-4 bg-danger/5 border-danger/10">
+                <h3 className="text-base font-bold text-danger mb-3">📞 Emergency Helpline Numbers</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="p-3 bg-white rounded-lg">
+                        <p className="text-sm font-bold">🏛️ Pension Helpline</p>
+                        <p className="text-xl font-bold text-primary">1800-11-1960</p>
+                        <p className="text-xs text-text-light">Toll-free, Mon-Sat, 9AM-6PM</p>
                     </div>
-                    <div className="p-4 bg-white rounded-xl">
-                        <p className="font-bold">🏥 CGHS Helpline</p>
-                        <p className="text-2xl font-bold text-primary">1800-11-0077</p>
-                        <p className="text-sm text-text-light">Toll-free, Mon-Fri, 9AM-5PM</p>
+                    <div className="p-3 bg-white rounded-lg">
+                        <p className="text-sm font-bold">🏥 CGHS Helpline</p>
+                        <p className="text-xl font-bold text-primary">1800-11-0077</p>
+                        <p className="text-xs text-text-light">Toll-free, Mon-Fri, 9AM-5PM</p>
                     </div>
                 </div>
             </div>
